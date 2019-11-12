@@ -4,4 +4,4 @@ This is a repository to show real examples on CI and deploy pipelines with jenki
 
 Is part of a linkedin article that could be found at:
 
-s
+https://www.linkedin.com/pulse/simple-cicd-approach-jenkins-juan-ignacio-paz
