@@ -1,0 +1,32 @@
+pipeline{
+    agent any
+    tools {nodejs "node"}
+    environment {
+        bucket='s3_bucket_name'
+   }
+    stages {
+        stage('checkout') {
+            steps {
+                git url:'git@bitbucket.org:company/project.git',
+                    credentialsId: 'REPO_SSH_KEY'
+            }
+        }
+        stage('Build'){
+            steps {
+                sh '''VERSION=$(git describe --tags `git rev-list --tags --max-count=1`)
+                      git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
+                      npm install
+                      zip -r ${VERSION}.zip ./src ./index.js ./package.json ./node_modules
+                    '''
+            }
+        }
+        stage('Push'){
+            steps {
+                sh '`aws ecr get-login --no-include-email --region us-east-2`'
+                sh '''VERSION=$(git describe --tags `git rev-list --tags --max-count=1`)
+                      aws s3 cp ${VERSION}.zip s3://${bucket}/sms/${VERSION}.zip
+                    '''
+            }
+        }
+    }
+}

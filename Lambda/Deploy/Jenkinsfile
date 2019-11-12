@@ -1,0 +1,23 @@
+pipeline{
+    agent any
+    environment {
+        bucket='bucket_name'
+        functionName='lambda_function_name'
+        region='us-east-2'
+   }
+    stages {
+        stage('deploy'){
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'AWS_DEV'
+                ]]) {
+                sh '''aws lambda update-function-code --function-name ${functionName} \
+                        --s3-bucket ${bucket} \
+                        --s3-key sms/${VERSION}.zip \
+                        --region ${region}'''
+                }
+            }
+        }
+    }
+}
